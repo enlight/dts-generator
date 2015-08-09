@@ -21,6 +21,6 @@
   },
   "devDependencies": {},
   "scripts": {
-    "prepublish": "tsc -m commonjs -t es5 typings/tsd.d.ts index.ts bin/dts-generator.ts"
+    "prepublish": "tsc"
   }
 }

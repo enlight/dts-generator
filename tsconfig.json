@@ -6,8 +6,13 @@
         "noImplicitAny": true
     },
     "files": [
+        "./typings/glob/glob.d.ts",
+        "./typings/minimatch/minimatch.d.ts",
+        "./typings/node/node.d.ts",
+        "./node_modules/typescript/lib/typescript.d.ts",
+        "./typings/bluebird/bluebird.d.ts",
+        "./typings/mkdirp/mkdirp.d.ts",
         "./bin/dts-generator.ts",
-        "./index.ts",
-        "./typings/tsd.d.ts"
+        "./index.ts"
     ]
 }
