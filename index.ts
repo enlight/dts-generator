@@ -1,5 +1,3 @@
-/// <reference path="./typings/tsd" />
-
 import fs = require('fs');
 import glob = require('glob');
 import mkdirp = require('mkdirp');
@@ -115,11 +113,13 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 	});
 
 	mkdirp.sync(pathUtil.dirname(options.out));
-	var output = fs.createWriteStream(options.out, { mode: parseInt('644', 8) });
+	//var output = fs.createWriteStream(options.out, { mode: parseInt('644', 8) });
+	// note: mode no longer appears to be an option according to the node.d.ts in DefinitelyTyped
+	const output = fs.createWriteStream(options.out);
 
 	var host = ts.createCompilerHost(compilerOptions);
 	var program = ts.createProgram(filenames, compilerOptions, host);
-	var checker = ts.createTypeChecker(program, true);
+	//var checker = ts.createTypeChecker(program, true);
 
 	function writeFile(filename: string, data: string, writeByteOrderMark: boolean) {
 		// Compiler is emitting the non-declaration file, which we do not care about
@@ -184,12 +184,24 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 		output.end();
 	});
 
+	function isExternalModule(sourceFile: ts.SourceFile): boolean {
+		return sourceFile.statements.some(node => {
+            const externalMarker = node.flags & ts.NodeFlags.Export
+				|| node.kind === ts.SyntaxKind.ImportEqualsDeclaration && (<ts.ImportEqualsDeclaration>node).moduleReference.kind === ts.SyntaxKind.ExternalModuleReference
+				|| node.kind === ts.SyntaxKind.ImportDeclaration
+				|| node.kind === ts.SyntaxKind.ExportAssignment
+				|| node.kind === ts.SyntaxKind.ExportDeclaration
+				? node : undefined;
+			return externalMarker ? true : false;
+		});
+	}
+	
 	function writeDeclaration(declarationFile: ts.SourceFile) {
 		var filename = declarationFile.fileName;
 		var sourceModuleId = options.name + filenameToMid(filename.slice(baseDir.length, -5));
 
-		if (declarationFile.externalModuleIndicator) {
-			output.write('declare module \'' + sourceModuleId + '\' {' + eol + indent);
+		if (isExternalModule(declarationFile)) {
+			output.write(`declare module '${sourceModuleId}' {` + eol + indent);
 
 			var content = processTree(declarationFile, function (node) {
 				if (node.kind === ts.SyntaxKind.ExternalModuleReference) {
@@ -206,7 +218,7 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 					node.kind === ts.SyntaxKind.StringLiteral &&
 					(node.parent.kind === ts.SyntaxKind.ExportDeclaration || node.parent.kind === ts.SyntaxKind.ImportDeclaration)
 				) {
-					var text = (<ts.StringLiteralTypeNode> node).text;
+					var text = (<ts.StringLiteral> node).text;
 					if (text.charAt(0) === '.') {
 						return ` '${filenameToMid(pathUtil.join(pathUtil.dirname(sourceModuleId), text))}'`;
 					}
