@@ -19,9 +19,7 @@
     "mkdirp": "0.5.0",
     "typescript": "^1.6.0-dev.20150808"
   },
-  "devDependencies": {
-    "tsd": "0.5.7"
-  },
+  "devDependencies": {},
   "scripts": {
     "prepublish": "tsc -m commonjs -t es5 typings/tsd.d.ts index.ts bin/dts-generator.ts"
   }
