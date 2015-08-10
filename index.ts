@@ -174,9 +174,8 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 		});
 
 		if (options.main) {
-			output.write(`declare module '${options.name}' {` + eol + indent);
-			output.write(`import main = require('${options.main}');` + eol + indent);
-			output.write('export = main;' + eol);
+			output.write(eol + `declare module '${options.name}' {` + eol);
+			output.write(indent + `export * from '${options.main}';` + eol);
 			output.write('}' + eol);
 			sendMessage(`Aliased main module ${options.name} to ${options.main}`);
 		}
@@ -208,7 +207,7 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 					var expression = <ts.LiteralExpression> (<ts.ExternalModuleReference> node).expression;
 
 					if (expression.text.charAt(0) === '.') {
-						return ' require(\'' + filenameToMid(pathUtil.join(pathUtil.dirname(sourceModuleId), expression.text)) + '\')';
+						return " require('" + filenameToMid(pathUtil.join(pathUtil.dirname(sourceModuleId), expression.text)) + "')";
 					}
 				}
 				else if (node.kind === ts.SyntaxKind.DeclareKeyword) {
