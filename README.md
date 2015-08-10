@@ -1,32 +1,33 @@
-.d.ts generator
+dts-generator
 ===============
 
-Generates a single .d.ts bundle containing external module declarations generated from TypeScript files.
+Generates a single `.d.ts` bundle containing external module declarations generated from TypeScript files.
 
 ## What does this mean?
 
-If you have a project with lots of individual TypeScript files that are designed to be consumed as external modules,
-the TypeScript compiler doesn’t allow you to actually create a single bundle out of them. This package leverages the
-TypeScript language services in TypeScript 1.4+ to generate a single .d.ts file containing multiple
-`declare module 'foo'` declarations. This allows you to distribute a single .d.ts file along with your compiled
-JavaScript that users can simply reference from the TypeScript compiler using a `/// <reference path />` comment.
+If you have a project with lots of individual TypeScript files that are designed to be consumed as
+external modules, the TypeScript compiler doesn’t allow you to create a single `.d.ts` file containing
+declarations for all of them. This package leverages the TypeScript language services in
+TypeScript 1.5+ to generate a single `.d.ts` file containing multiple `declare module 'foo'`
+declarations. This allows you to distribute a single `.d.ts` file along with your compiled
+JavaScript that users can simply reference in their TypeScript projects.
 
-.d.ts generator will also correctly merge non-external-module files, and any already-existing .d.ts files.
+dts-generator will also correctly merge non-external-module files, and any already-existing `.d.ts` files.
 
 ## Usage
 
 1. `npm install dts-generator`
 
-2. Generate your d.ts bundle:
+2. Generate your `d.ts` bundle:
 
    Programmatically:
 
    ```js
 require('dts-generator').generate({
-	name: 'package-name',
-	baseDir: '/path/to/package-directory',
+  name: 'package-name',
+  baseDir: '/path/to/package-directory',
   files: [ 'a.ts', 'b.ts', ... ]
-	out: 'package-name.d.ts'
+  out: 'package-name.d.ts'
 });
 ```
 
@@ -56,14 +57,12 @@ module.exports = function (grunt) {
 };
 ```
 
-3. Reference your generated d.ts bundle from somewhere in your consumer module and import away!:
+3. Reference your generated `d.ts` bundle from somewhere in your consumer module and import away!:
 
    ```ts
 /// <reference path="typings/package-name.d.ts" />
 
-import Foo = require('package-name/Foo');
-
-// ...
+import * as Foo from 'package-name/Foo';
 ```
 
 ## Options
