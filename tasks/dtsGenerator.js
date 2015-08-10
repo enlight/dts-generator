@@ -11,9 +11,13 @@ module.exports = function (grunt) {
 			return path.relative(kwArgs.baseDir, filename);
 		});
 
-		dtsGenerator.generate(kwArgs, onProgress).then(function () {
+		dtsGenerator.generate(kwArgs, onProgress)
+		.then(function () {
 			grunt.log.writeln('Generated d.ts bundle at \x1b[36m' + kwArgs.out + '\x1b[39;49m');
 			done();
-		}, done);
+		})
+		.catch(function (error) {
+			done(error);
+		});
 	});
 };
