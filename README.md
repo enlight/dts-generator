@@ -23,51 +23,51 @@ dts-generator will also correctly merge non-external-module files, and any alrea
    Programmatically:
 
    ```js
-require('dts-generator').generate({
-  name: 'package-name',
-  baseDir: '/path/to/package-directory',
-  files: [ 'a.ts', 'b.ts', ... ]
-  out: 'package-name.d.ts'
-});
-```
+   require('dts-generator').generate({
+     name: 'package-name',
+     baseDir: '/path/to/package-directory',
+     files: [ 'a.ts', 'b.ts', ... ]
+     out: 'package-name.d.ts'
+   });
+   ```
 
    Command-line:
 
    ```bash
-dts-generator --name package-name --baseDir /path/to/package-directory --out package-name.d.ts a.ts b.ts ...
-```
+   dts-generator --name package-name --baseDir /path/to/package-directory --out package-name.d.ts a.ts b.ts ...
+   ```
 
    Grunt:
 
    ```js
-module.exports = function (grunt) {
-	grunt.loadNpmTasks('dts-generator');
-	grunt.initConfig({
-		dtsGenerator: {
-			options: {
-				name: 'package-name',
-				baseDir: '/path/to/package-directory',
-				out: 'package-name.d.ts',
-				excludes: [
-					'typings/**',
-					'!typings/lib.ext.d.ts',
-				]
-			},
-			default: {
-				src: [ '/path/to/package-directory/**/*.ts' ]
-			}
-		}
-	});
-};
-```
+   module.exports = function (grunt) {
+     grunt.loadNpmTasks('dts-generator');
+     grunt.initConfig({
+       dtsGenerator: {
+         options: {
+           name: 'package-name',
+           baseDir: '/path/to/package-directory',
+           out: 'package-name.d.ts',
+           excludes: [
+             'typings/**',
+             '!typings/lib.ext.d.ts',
+           ]
+         },
+         default: {
+           src: [ '/path/to/package-directory/**/*.ts' ]
+         }
+       }
+     });
+   };
+   ```
 
 3. Reference your generated `d.ts` bundle from somewhere in your consumer module and import away!:
 
    ```ts
-/// <reference path="typings/package-name.d.ts" />
-
-import * as Foo from 'package-name/Foo';
-```
+   /// <reference path="typings/package-name.d.ts" />
+   
+   import * as Foo from 'package-name/Foo';
+   ```
 
 ## Options
 
