@@ -196,7 +196,7 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 
 			sendMessage(`Processing ${sourceFile.fileName}`);
 
-			// Source file is already a declaration file so should does not need to be pre-processed by the emitter
+			// Source file is already a declaration file so does not need to be pre-processed by the emitter
 			if (sourceFile.fileName.slice(-5) === '.d.ts') {
 				writeDeclaration(sourceFile);
 				return;
