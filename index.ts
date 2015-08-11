@@ -4,6 +4,7 @@ import os = require('os');
 import pathUtil = require('path');
 import Promise = require('bluebird');
 import ts = require('typescript');
+import multimatch = require('multimatch');
 
 interface Options {
 	baseDir: string;
@@ -106,11 +107,7 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 	};
 
 	var filenames = getFilenames(baseDir, options.files);
-	var excludesMap: { [filename: string]: boolean; } = {};
-	options.excludes && options.excludes.forEach(function (filename) {
-		excludesMap[filenameToMid(pathUtil.resolve(baseDir, filename))] = true;
-	});
-
+	
 	// load the tsconfig.json from the baseDir (if it exists)
 	const tsConfigFilename = pathUtil.join(baseDir, 'tsconfig.json');
 	if (fs.existsSync(tsConfigFilename)) {
@@ -183,15 +180,20 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 			});
 		}
 
-		program.getSourceFiles().some(function (sourceFile) {
+		program.getSourceFiles().some((sourceFile) => {
 			// Source file is a default library, or other dependency from another project, that should not be included in
 			// our bundled output
 			if (pathUtil.normalize(sourceFile.fileName).indexOf(baseDir) !== 0) {
 				return;
 			}
 
-			if (excludesMap[filenameToMid(pathUtil.normalize(sourceFile.fileName))]) {
-				return;
+			if (options.excludes) {
+				const relativeFilename = pathUtil.relative(baseDir, sourceFile.fileName);
+				const matches = multimatch(relativeFilename, options.excludes);
+				if (matches.length !== 0) {
+					sendMessage(`Excluding ${relativeFilename}`);
+					return;
+				}
 			}
 
 			sendMessage(`Processing ${sourceFile.fileName}`);

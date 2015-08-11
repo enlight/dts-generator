@@ -47,7 +47,11 @@ module.exports = function (grunt) {
 			options: {
 				name: 'package-name',
 				baseDir: '/path/to/package-directory',
-				out: 'package-name.d.ts'
+				out: 'package-name.d.ts',
+				excludes: [
+					'typings/**',
+					'!typings/lib.ext.d.ts',
+				]
 			},
 			default: {
 				src: [ '/path/to/package-directory/**/*.ts' ]
@@ -69,8 +73,10 @@ import * as Foo from 'package-name/Foo';
 
 * `baseDir: string`: The base directory for the package being bundled. Any dependencies discovered outside this
   directory will be excluded from the bundle.
-* `excludes?: string[]`: A list of files, relative to `baseDir`, that should be excluded from the bundle. Use the
-  `--exclude` flag one or more times on the command-line.
+* `excludes?: string[]`: A list of glob expressions, relative to `baseDir`, that should be excluded
+  from the generated `d.ts`. Use the `--exclude` flag one or more times on the command-line. See
+  [minimatch](https://github.com/isaacs/minimatch#features) for information about supported glob
+  expressions.
 * `externs?: string[]`: A list of external module reference paths that should be inserted as reference comments. Use
   the `--extern` flag one or more times on the command-line.
 * `files: string[]`: A list of files from the baseDir to bundle.
