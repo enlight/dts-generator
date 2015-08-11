@@ -6,7 +6,6 @@
         "noImplicitAny": true
     },
     "files": [
-        "./typings/glob/glob.d.ts",
         "./typings/minimatch/minimatch.d.ts",
         "./typings/node/node.d.ts",
         "./node_modules/typescript/lib/typescript.d.ts",

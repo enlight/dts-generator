@@ -1,5 +1,4 @@
 import fs = require('fs');
-import glob = require('glob');
 import mkdirp = require('mkdirp');
 import os = require('os');
 import pathUtil = require('path');
