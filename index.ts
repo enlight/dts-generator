@@ -99,11 +99,11 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 	var eol = options.eol || os.EOL;
 	var nonEmptyLineStart = new RegExp(eol + '(?!' + eol + '|$)', 'g');
 	var indent = options.indent === undefined ? '\t' : options.indent;
-	var target = options.target || ts.ScriptTarget.Latest;
-	var compilerOptions: ts.CompilerOptions = {
+	let compilerOptions: ts.CompilerOptions = {
 		declaration: true,
 		module: ts.ModuleKind.CommonJS,
-		target: target
+		newLine: (eol === '\r\n') ? ts.NewLineKind.CarriageReturnLineFeed : ts.NewLineKind.LineFeed,
+		target: options.target || ts.ScriptTarget.Latest
 	};
 
 	var filenames = getFilenames(baseDir, options.files);
@@ -119,6 +119,24 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 		if (tsConfigError) {
 			return Promise.reject(tsConfigError);
 		}
+		
+		const tsCompilerOptions: ts.CompilerOptions = tsConfig.compilerOptions;
+		tsCompilerOptions.declaration = true;
+		// the eol option will override the line terminator specified in the tsconfig
+		if (options.eol) {
+			tsCompilerOptions.newLine = (options.eol === '\r\n') ? ts.NewLineKind.CarriageReturnLineFeed : ts.NewLineKind.LineFeed;
+		} else if (tsCompilerOptions.newLine) {
+			eol = (tsCompilerOptions.newLine === ts.NewLineKind.CarriageReturnLineFeed) ? '\r\n' : '\n';
+		}
+		// the target option will override the target specified in the tsconfig
+		if (options.target) {
+			tsCompilerOptions.target = options.target;
+		}
+		// remove compiler options that don't make sense in the context of declaration generation
+		delete tsCompilerOptions.watch;
+		delete tsCompilerOptions.diagnostics;
+		delete tsCompilerOptions.noEmit;
+		compilerOptions = tsCompilerOptions;
 		
 		// prepend all the .d.ts files listed in the tsconfig.json to the array of filenames to be
 		// processed by the compiler, this is to ensure the compiler is able resolve all public
@@ -146,7 +164,7 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 			return;
 		}
 
-		writeDeclaration(ts.createSourceFile(filename, data, target, true));
+		writeDeclaration(ts.createSourceFile(filename, data, compilerOptions.target, true));
 	}
 
 	return new Promise<void>(function (resolve, reject) {
