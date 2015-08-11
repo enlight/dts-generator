@@ -112,23 +112,26 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 		excludesMap[filenameToMid(pathUtil.resolve(baseDir, filename))] = true;
 	});
 
-	const { config: tsConfig, error: tsConfigError } = ts.readConfigFile(pathUtil.join(baseDir, 'tsconfig.json'));
-	
-	if (tsConfigError) {
-		return Promise.reject(tsConfigError);
+	// load the tsconfig.json from the baseDir (if it exists)
+	const tsConfigFilename = pathUtil.join(baseDir, 'tsconfig.json');
+	if (fs.existsSync(tsConfigFilename)) {
+		const { config: tsConfig, error: tsConfigError } = ts.readConfigFile(tsConfigFilename);
+		if (tsConfigError) {
+			return Promise.reject(tsConfigError);
+		}
+		
+		// prepend all the .d.ts files listed in the tsconfig.json to the array of filenames to be
+		// processed by the compiler, this is to ensure the compiler is able resolve all public
+		// types in .ts files that don't contain reference path comments
+		let tsConfigDeclarationFiles: string[] = [];
+		(<Array<string>> tsConfig.files).forEach((filename) => {
+			if (filename.slice(-5) === '.d.ts') {
+				tsConfigDeclarationFiles.push(pathUtil.resolve(baseDir, filename));
+			}
+		});
+		filenames = tsConfigDeclarationFiles.concat(filenames);
 	}
 	
-	// prepend all the .d.ts files listed in the tsconfig.json to the array of filenames to be
-	// processed by the compiler, this is to ensure the compiler is able resolve all public
-	// types in .ts files that don't contain reference path comments
-	let tsConfigDeclarationFiles: string[] = [];
-	(<Array<string>> tsConfig.files).forEach((filename) => {
-		if (filename.slice(-5) === '.d.ts') {
-			tsConfigDeclarationFiles.push(pathUtil.resolve(baseDir, filename));
-		}
-	});
-	filenames = tsConfigDeclarationFiles.concat(filenames);
-
 	mkdirp.sync(pathUtil.dirname(options.out));
 	//var output = fs.createWriteStream(options.out, { mode: parseInt('644', 8) });
 	// note: mode no longer appears to be an option according to the node.d.ts in DefinitelyTyped
