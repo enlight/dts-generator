@@ -242,7 +242,7 @@ export function generate(options: Options, sendMessage: (message: string) => voi
 		var sourceModuleId = options.name + filenameToMid(filename.slice(baseDir.length, -5));
 
 		if (isExternalModule(declarationFile)) {
-			output.write(`declare module '${sourceModuleId}' {` + eol + indent);
+			output.write(eol + `declare module '${sourceModuleId}' {` + eol + indent);
 
 			var content = processTree(declarationFile, function (node) {
 				if (node.kind === ts.SyntaxKind.ExternalModuleReference) {
