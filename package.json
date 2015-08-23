@@ -3,12 +3,12 @@
   "description": ".d.ts generator. Generates a single d.ts bundle containing external modules from TypeScript files.",
   "version": "1.6.0-pre",
   "bugs": {
-    "url": "https://github.com/SitePen/dts-generator/issues"
+    "url": "https://github.com/enlight/dts-generator/issues"
   },
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SitePen/dts-generator.git"
+    "url": "https://github.com/enlight/dts-generator.git"
   },
   "bin": {
     "dts-generator": "bin/dts-generator"
