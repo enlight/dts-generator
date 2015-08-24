@@ -84,7 +84,11 @@ function generate(options, sendMessage) {
         if (tsConfigError) {
             return Promise.reject(tsConfigError);
         }
-        var tsCompilerOptions = tsConfig.compilerOptions;
+        var configParseResult = ts.parseConfigFile(tsConfig, ts.sys, pathUtil.dirname(tsConfigFilename));
+        if (configParseResult.errors.length > 0) {
+            return Promise.reject(configParseResult.errors);
+        }
+        var tsCompilerOptions = configParseResult.options;
         tsCompilerOptions.declaration = true;
         // the eol option will override the line terminator specified in the tsconfig
         if (options.eol) {
